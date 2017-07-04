@@ -1,4 +1,10 @@
 *.md
 !README.md
 oracle/*
-vendor/*
+
+docker.conf
+build.sh
+tag.sh
+run.sh
+exec.sh
+push.sh
