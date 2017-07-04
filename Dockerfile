@@ -15,7 +15,7 @@ ENV ORACLE_BASE /opt/oracle
 
 WORKDIR $ORACLE_BASE
 
-RUN apk update && apk add libaio
+RUN apk update && apk add libaio && rm -f /var/cache/apk/*
 COPY instantclient-$ORACLE_INSTANTCLIENT_VERSION/instantclient-basic-linux.x64-$ORACLE_INSTANTCLIENT_VERSION.zip .
 COPY instantclient-$ORACLE_INSTANTCLIENT_VERSION/instantclient-odbc-linux.x64-$ORACLE_INSTANTCLIENT_VERSION.zip .
 COPY instantclient-$ORACLE_INSTANTCLIENT_VERSION/instantclient-sqlplus-linux.x64-$ORACLE_INSTANTCLIENT_VERSION.zip .
