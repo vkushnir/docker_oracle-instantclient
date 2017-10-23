@@ -1,6 +1,9 @@
-FROM frolvlad/alpine-glibc
-#FROM alpine
+FROM ubuntu
 MAINTAINER Vladimir Kushnir <vkushnir@gmail.com>
+
+ARG ORACLE_INSTANTCLIENT_MAJOR
+ARG ORACLE_INSTANTCLIENT_VERSION
+ARG DEBIAN_FRONTEND=noninteractive
 
 LABEL \
     version="0.1" \
@@ -8,31 +11,25 @@ LABEL \
 
 ENV NLS_LANG RUSSIAN_CIS.UTF8
 ENV LANG en_US.UTF-8
-ENV ORACLE_INSTANTCLIENT_MAJOR 12.2
-ENV ORACLE_INSTANTCLIENT_VERSION 12.2.0.1.0
-ENV ORACLE_BASE /opt/oracle
-ENV ORACLE_HOME $ORACLE_BASE/instantclient_12_2
+ENV LANGUAGE=en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
+ENV ORACLE_INSTANTCLIENT_MAJOR ${ORACLE_INSTANTCLIENT_MAJOR:-12.2}
+ENV ORACLE_INSTANTCLIENT_VERSION ${ORACLE_INSTANTCLIENT_VERSION:-12.2.0.1.0}
+ENV ORACLE_HOME /usr/lib/oracle/${ORACLE_INSTANTCLIENT_MAJOR}/client64
+ENV PATH=$PATH:$ORACLE_HOME/bin
+ENV LD_LIBRARY_PATH /usr/lib/oracle/${ORACLE_INSTANTCLIENT_MAJOR}/client64/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
 
-WORKDIR $ORACLE_BASE
+RUN apt-get clean && apt-get update && apt-get install -y --no-install-recommends apt-utils locales libaio1 \
+ && locale-gen en_US.UTF-8 ru_RU.UTF-8 ru_RU.CP1251 \
+ && apt-get autoremove \
+ && rm -rf /var/lib/apt/lists/*
 
-RUN apk update && apk add libaio && rm -f /var/cache/apk/*
-COPY vendor/instantclient-$ORACLE_INSTANTCLIENT_VERSION/instantclient-basic-linux.x64-$ORACLE_INSTANTCLIENT_VERSION.zip .
-COPY vendor/instantclient-$ORACLE_INSTANTCLIENT_VERSION/instantclient-odbc-linux.x64-$ORACLE_INSTANTCLIENT_VERSION.zip .
-COPY vendor/instantclient-$ORACLE_INSTANTCLIENT_VERSION/instantclient-sqlplus-linux.x64-$ORACLE_INSTANTCLIENT_VERSION.zip .
-COPY vendor/instantclient-$ORACLE_INSTANTCLIENT_VERSION/instantclient-tools-linux.x64-$ORACLE_INSTANTCLIENT_VERSION.zip .
-COPY vendor/instantclient-$ORACLE_INSTANTCLIENT_VERSION/instantclient-sdk-linux.x64-$ORACLE_INSTANTCLIENT_VERSION.zip .
-RUN unzip instantclient-basic-linux.x64-$ORACLE_INSTANTCLIENT_VERSION.zip &&\
-	unzip instantclient-odbc-linux.x64-$ORACLE_INSTANTCLIENT_VERSION.zip &&\
-	unzip instantclient-sqlplus-linux.x64-$ORACLE_INSTANTCLIENT_VERSION.zip &&\
-	unzip instantclient-tools-linux.x64-$ORACLE_INSTANTCLIENT_VERSION.zip &&\
-	unzip instantclient-sdk-linux.x64-$ORACLE_INSTANTCLIENT_VERSION.zip &&\
-	rm -f instantclient-*.zip &&\
-	chmod -R -x $ORACLE_HOME &&\
-	cd $ORACLE_HOME &&\
-	chmod +x adrci genezi sqlplus exp* imp* sqlldr wrc &&\
-	ln -s libclntsh.so.12.1 libclntsh.so &&\
-	ln -s libnnz12.so libnnz.so
+COPY vendor/instantclient-${ORACLE_INSTANTCLIENT_VERSION}/*oracle-instantclient${ORACLE_INSTANTCLIENT_MAJOR}-*_${ORACLE_INSTANTCLIENT_VERSION}-2_amd64.deb ./
     
-ENV LD_LIBRARY_PATH $ORACLE_HOME
-ENV PATH $PATH:$ORACLE_HOME
-
+RUN dpkg -i oracle-instantclient${ORACLE_INSTANTCLIENT_MAJOR}-*_${ORACLE_INSTANTCLIENT_VERSION}-2_amd64.deb \
+ && rm -rf oracle-instantclient${ORACLE_INSTANTCLIENT_MAJOR}-*_${ORACLE_INSTANTCLIENT_VERSION}-2_amd64.deb \
+ && ln -s /usr/include/oracle/${ORACLE_INSTANTCLIENT_MAJOR}/client64 ${ORACLE_HOME}/include \
+ && ln -s $(basename `find /usr/lib/oracle/${ORACLE_INSTANTCLIENT_MAJOR}/client64/lib/libnnz*.so -type f`) /usr/lib/oracle/${ORACLE_INSTANTCLIENT_MAJOR}/client64/lib/libnnz.so \
+ && echo /usr/lib/oracle/${ORACLE_INSTANTCLIENT_MAJOR}/client64/lib > /etc/ld.so.conf.d/oracle.conf \
+ && chmod o+r /etc/ld.so.conf.d/oracle.conf \
+ && ldconfig

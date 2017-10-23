@@ -3,8 +3,8 @@
 oracle/*
 
 docker.conf
-build.sh
-tag.sh
-run.sh
-exec.sh
-push.sh
+*.sh
+
+vendor/instantclient-*/*.rpm
+vendor/instantclient-*/*.zip
+
