@@ -52,7 +52,6 @@ RUN apt-get clean && \
     apt-get install -y --no-install-recommends locales libaio1 && \
     locale-gen en_US.UTF-8 ru_RU.UTF-8 ru_RU.CP1251
 
-#COPY vendor/instantclient-${ORACLE_INSTANTCLIENT_VERSION}/oracle-instantclient${ORACLE_INSTANTCLIENT_MAJOR}-*-${ORACLE_INSTANTCLIENT_VERSION}-1.x86_64.rpm /
 COPY --from=build /oracle-instantclient${ORACLE_INSTANTCLIENT_MAJOR}-*_${ORACLE_INSTANTCLIENT_VERSION}-2_amd64.deb /
     
 RUN dpkg -i oracle-instantclient${ORACLE_INSTANTCLIENT_MAJOR}-*_${ORACLE_INSTANTCLIENT_VERSION}-2_amd64.deb \
