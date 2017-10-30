@@ -7,13 +7,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 WORKDIR /
 
 RUN apt-get update && \
-    apt-get install -y build-essential ca-certificates git libtool vim wget fakeroot dpkg-dev quilt debhelper mc alien \
-    libcurl4-openssl-dev libcap-dev libgdbm-dev \
-    libiodbc2-dev libjson0-dev libkrb5-dev libldap2-dev libpam0g-dev \
-    libpcap-dev libperl-dev libmysqlclient-dev libpq-dev libreadline-dev \
-    libsasl2-dev libsqlite3-dev libssl-dev libtalloc-dev libwbclient-dev \
-    libyubikey-dev libykclient-dev libmemcached-dev libhiredis-dev python-dev \
-    samba-dev libcollectdclient-dev
+    apt-get install -y alien
 
 ENV ORACLE_INSTANTCLIENT_MAJOR ${ORACLE_INSTANTCLIENT_MAJOR:-12.2}
 ENV ORACLE_INSTANTCLIENT_VERSION ${ORACLE_INSTANTCLIENT_VERSION:-12.2.0.1.0}
