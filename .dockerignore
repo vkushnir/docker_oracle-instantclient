@@ -1,3 +1,3 @@
 *.md
 .docker_data
-
+python2/*

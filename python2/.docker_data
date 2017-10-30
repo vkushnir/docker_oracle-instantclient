@@ -1,0 +1,6 @@
+# Docker image TAG
+DTAG="vkushnir/oracle-instantclient:python2"
+
+# DOcker shell
+DSHELL="bash"
+
